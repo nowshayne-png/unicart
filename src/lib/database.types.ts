@@ -1,0 +1,60 @@
+export interface Database {
+  public: {
+    Tables: {
+      menu_items: {
+        Row: {
+          id: string;
+          name: string;
+          price: number;
+          category: string;
+          image_url: string;
+          description: string;
+          is_available: boolean;
+          is_recommended: boolean;
+          created_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['menu_items']['Row'], 'id' | 'created_at'>;
+        Update: Partial<Database['public']['Tables']['menu_items']['Insert']>;
+      };
+      order_batches: {
+        Row: {
+          id: string;
+          slot_label: string;
+          current_step: number;
+          status_message: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['order_batches']['Row'], 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Database['public']['Tables']['order_batches']['Insert']>;
+      };
+      orders: {
+        Row: {
+          id: string;
+          batch_id: string;
+          user_name: string;
+          hostel: string;
+          room: string;
+          phone: string;
+          items: CartItem[];
+          total_amount: number;
+          payment_mode: string;
+          created_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['orders']['Row'], 'id' | 'created_at'>;
+        Update: Partial<Database['public']['Tables']['orders']['Insert']>;
+      };
+    };
+  };
+}
+
+export interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+export type MenuItem = Database['public']['Tables']['menu_items']['Row'];
+export type OrderBatch = Database['public']['Tables']['order_batches']['Row'];
+export type Order = Database['public']['Tables']['orders']['Row'];

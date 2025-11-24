@@ -1,0 +1,53 @@
+import { useState } from 'react';
+import { Package, Radio, Menu } from 'lucide-react';
+import { AdminOrders } from './AdminOrders';
+import { AdminTracking } from './AdminTracking';
+import { AdminMenu } from './AdminMenu';
+
+export function Admin() {
+  const [activeTab, setActiveTab] = useState<'orders' | 'tracking' | 'menu'>('orders');
+
+  const tabs = [
+    { id: 'orders' as const, label: 'Orders', icon: Package },
+    { id: 'tracking' as const, label: 'Tracking', icon: Radio },
+    { id: 'menu' as const, label: 'Menu', icon: Menu },
+  ];
+
+  return (
+    <div className="min-h-screen bg-black text-white">
+      <div className="max-w-md mx-auto">
+        <div className="sticky top-0 z-40 bg-black/95 backdrop-blur-sm border-b border-gray-800">
+          <div className="px-5 py-6">
+            <h1 className="text-2xl font-bold mb-6">Admin Panel</h1>
+
+            <div className="flex gap-2">
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold transition-colors ${
+                      activeTab === tab.id
+                        ? 'bg-[#c4ff00] text-black'
+                        : 'bg-[#1a1a1a] text-white hover:bg-[#252525]'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="text-sm">{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <div className="px-5 py-6">
+          {activeTab === 'orders' && <AdminOrders />}
+          {activeTab === 'tracking' && <AdminTracking />}
+          {activeTab === 'menu' && <AdminMenu />}
+        </div>
+      </div>
+    </div>
+  );
+}

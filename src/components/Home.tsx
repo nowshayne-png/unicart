@@ -1,0 +1,162 @@
+import { useState, useEffect } from 'react';
+import { ShoppingCart, Search, Repeat, HelpCircle, Sparkles } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+import type { MenuItem } from '../lib/database.types';
+import { useCart } from '../contexts/CartContext';
+import { MenuItemCard } from './MenuItemCard';
+import { FloatingCartBar } from './FloatingCartBar';
+
+const categories = ['All', 'Biryani', 'Chinese', 'Snacks', 'Drinks'];
+
+const categoryIcons: Record<string, string> = {
+  Biryani: '🍛',
+  Chinese: '🥡',
+  Snacks: '🍟',
+  Drinks: '🥤',
+};
+
+export function Home({ onNavigate }: { onNavigate: (screen: string) => void }) {
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [loading, setLoading] = useState(true);
+  const { totalItems } = useCart();
+
+  useEffect(() => {
+    loadMenuItems();
+  }, []);
+
+  const loadMenuItems = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('menu_items')
+        .select('*')
+        .eq('is_available', true)
+        .order('is_recommended', { ascending: false });
+
+      if (error) throw error;
+      setMenuItems(data || []);
+    } catch (error) {
+      console.error('Error loading menu:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredItems = selectedCategory === 'All'
+    ? menuItems
+    : menuItems.filter((item) => item.category === selectedCategory);
+
+  const recommendedItems = menuItems.filter((item) => item.is_recommended);
+
+  return (
+    <div className="min-h-screen bg-black text-white pb-32">
+      <div className="max-w-md mx-auto">
+        <header className="sticky top-0 z-40 bg-black/95 backdrop-blur-sm border-b border-gray-800">
+          <div className="px-5 py-4">
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-2xl font-bold">Unicart</h1>
+              <button
+                onClick={() => onNavigate('cart')}
+                className="relative bg-[#c4ff00] text-black w-12 h-12 rounded-2xl flex items-center justify-center font-semibold"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-black text-[#c4ff00] text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                    {totalItems}
+                  </span>
+                )}
+              </button>
+            </div>
+
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search for something tasty..."
+                className="w-full bg-[#1a1a1a] text-white rounded-2xl pl-12 pr-4 py-3.5 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#c4ff00]/20"
+              />
+            </div>
+          </div>
+
+          <div className="px-5 pb-4 space-y-3">
+            <button className="w-full flex items-center gap-3 text-left py-3 hover:bg-[#1a1a1a] rounded-xl px-3 transition-colors">
+              <Repeat className="w-5 h-5" />
+              <span>Repeat last order</span>
+            </button>
+            <button className="w-full flex items-center gap-3 text-left py-3 hover:bg-[#1a1a1a] rounded-xl px-3 transition-colors">
+              <HelpCircle className="w-5 h-5" />
+              <span>Help me choose</span>
+            </button>
+            <button className="w-full flex items-center gap-3 text-left py-3 hover:bg-[#1a1a1a] rounded-xl px-3 transition-colors">
+              <Sparkles className="w-5 h-5" />
+              <span>Surprise me</span>
+            </button>
+          </div>
+        </header>
+
+        <div className="px-5 py-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Top Categories</h2>
+            <button className="text-sm text-gray-400 flex items-center gap-1">
+              View all →
+            </button>
+          </div>
+
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl whitespace-nowrap transition-colors ${
+                  selectedCategory === category
+                    ? 'bg-[#c4ff00] text-black font-semibold'
+                    : 'bg-[#1a1a1a] text-white hover:bg-[#252525]'
+                }`}
+              >
+                {category !== 'All' && <span>{categoryIcons[category]}</span>}
+                <span>{category}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {recommendedItems.length > 0 && selectedCategory === 'All' && (
+          <div className="px-5 pb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Recommended for you</h2>
+              <button className="text-sm text-gray-400 flex items-center gap-1">
+                View all →
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              {recommendedItems.slice(0, 4).map((item) => (
+                <MenuItemCard key={item.id} item={item} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="px-5">
+          <h2 className="text-lg font-semibold mb-4">
+            {selectedCategory === 'All' ? 'All Items' : selectedCategory}
+          </h2>
+
+          {loading ? (
+            <div className="text-center py-12 text-gray-400">Loading menu...</div>
+          ) : filteredItems.length === 0 ? (
+            <div className="text-center py-12 text-gray-400">No items found</div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              {filteredItems.map((item) => (
+                <MenuItemCard key={item.id} item={item} />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <FloatingCartBar onNavigate={onNavigate} />
+    </div>
+  );
+}
