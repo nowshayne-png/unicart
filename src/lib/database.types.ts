@@ -44,6 +44,24 @@ export interface Database {
         Insert: Omit<Database['public']['Tables']['orders']['Row'], 'id' | 'created_at'>;
         Update: Partial<Database['public']['Tables']['orders']['Insert']>;
       };
+      hero_banners: {
+        Row: {
+          id: string;
+          title: string;
+          description: string;
+          image_url: string;
+          bg_color: string;
+          text_color: string;
+          action_text: string;
+          action_link: string;
+          order: number;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['hero_banners']['Row'], 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Database['public']['Tables']['hero_banners']['Insert']>;
+      };
     };
   };
 }
@@ -58,3 +76,4 @@ export interface CartItem {
 export type MenuItem = Database['public']['Tables']['menu_items']['Row'];
 export type OrderBatch = Database['public']['Tables']['order_batches']['Row'];
 export type Order = Database['public']['Tables']['orders']['Row'];
+export type HeroBanner = Database['public']['Tables']['hero_banners']['Row'];

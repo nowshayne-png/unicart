@@ -1,16 +1,18 @@
 import { useState } from 'react';
-import { Package, Radio, Menu } from 'lucide-react';
+import { Package, Radio, Menu, Image } from 'lucide-react';
 import { AdminOrders } from './AdminOrders';
 import { AdminTracking } from './AdminTracking';
 import { AdminMenu } from './AdminMenu';
+import { AdminHeroBanners } from './AdminHeroBanners';
 
 export function Admin() {
-  const [activeTab, setActiveTab] = useState<'orders' | 'tracking' | 'menu'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'tracking' | 'menu' | 'banners'>('orders');
 
   const tabs = [
     { id: 'orders' as const, label: 'Orders', icon: Package },
     { id: 'tracking' as const, label: 'Tracking', icon: Radio },
     { id: 'menu' as const, label: 'Menu', icon: Menu },
+    { id: 'banners' as const, label: 'Banners', icon: Image },
   ];
 
   return (
@@ -46,6 +48,7 @@ export function Admin() {
           {activeTab === 'orders' && <AdminOrders />}
           {activeTab === 'tracking' && <AdminTracking />}
           {activeTab === 'menu' && <AdminMenu />}
+          {activeTab === 'banners' && <AdminHeroBanners />}
         </div>
       </div>
     </div>

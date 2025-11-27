@@ -5,6 +5,7 @@ import type { MenuItem } from '../lib/database.types';
 import { useCart } from '../contexts/CartContext';
 import { MenuItemCard } from './MenuItemCard';
 import { FloatingCartBar } from './FloatingCartBar';
+import { HeroBannerCarousel } from './HeroBannerCarousel';
 
 const categories = ['All', 'Biryani', 'Chinese', 'Snacks', 'Drinks'];
 
@@ -93,6 +94,8 @@ export function Home({ onNavigate }: { onNavigate: (screen: string) => void }) {
             </button>
           </div>
         </header>
+
+        <HeroBannerCarousel />
 
         <div className="px-5 py-6">
           <div className="flex items-center justify-between mb-4">
